@@ -1,0 +1,9 @@
+# CODEOWNERS
+# Standard changes require approval from specification maintainer
+
+* @Nick-heo-eg
+
+# Critical specification files require explicit approval
+/STANDARD.md @Nick-heo-eg
+/docs/ @Nick-heo-eg
+/examples/policies/ @Nick-heo-eg

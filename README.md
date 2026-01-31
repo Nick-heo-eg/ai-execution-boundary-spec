@@ -99,7 +99,7 @@ This spec **does not**:
 
 ## Reference Implementation
 
-See [echo_role_guard](https://github.com/YOUR_ORG/echo_role_guard) for a working implementation of these patterns applied to code generation workflows.
+See [echo_role_guard](../echo_role_guard) for a working implementation of these patterns applied to code generation workflows.
 
 ---
 
@@ -115,10 +115,11 @@ This is deliberately **minimal**. Additional layers can be added, but these five
 ## Contributing
 
 This is a private repository during initial development.
-Public RFC process TBD.
+
+For specification changes, see [RFC Process](docs/RFC_PROCESS.md).
 
 ---
 
 ## License
 
-TBD (likely permissive open license for max adoption)
+MIT License - See [LICENSE](LICENSE) file for details.

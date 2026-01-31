@@ -471,7 +471,7 @@ This is a private repository during initial development.
 
 ## License
 
-TBD (targeting permissive open license for maximum adoption)
+MIT License - See [LICENSE](LICENSE) file for details.
 
 ---
 

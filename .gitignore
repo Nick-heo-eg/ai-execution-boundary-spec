@@ -32,3 +32,8 @@ secrets/
 extracted/
 archives/
 legacy/
+
+# Local guides (not for commit)
+TAG_INSTRUCTIONS.md
+COMMIT_GUIDE.md
+REWRITE_REPORT.md
