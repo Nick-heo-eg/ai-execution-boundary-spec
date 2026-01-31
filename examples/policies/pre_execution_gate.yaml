@@ -1,0 +1,12 @@
+action:
+  proposed_by: agent
+  intent: "credential_change"
+  target: "idp"
+  risk: critical
+
+judgment:
+  decision: ESCALATE
+  reason: "Credential changes require dual control"
+  required_actor:
+    - human
+    - security_officer

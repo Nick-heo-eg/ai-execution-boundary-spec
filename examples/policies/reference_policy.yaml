@@ -1,0 +1,9 @@
+policy:
+  default_decision: HOLD
+  irreversible_actions:
+    - external_payment
+    - credential_change
+    - fund_transfer
+  require_human_for:
+    - external_payment
+    - credential_change

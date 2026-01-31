@@ -1,0 +1,5 @@
+flowchart LR
+  A[LLM Agent] --> J[Judgment Layer]
+  J -->|ALLOW| E[Execution Layer]
+  J -->|ESCALATE| H[Human + Security]
+  J -->|DENY| X[Blocked]

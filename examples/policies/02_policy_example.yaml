@@ -1,0 +1,16 @@
+policy:
+  - intent: external_payment
+    risk: critical
+    decision: HOLD
+    approver: finance
+
+  - intent: file_read
+    risk: low
+    decision: ALLOW
+
+  - intent: credential_change
+    risk: high
+    decision: ESCALATE
+    approver:
+      - security
+      - human
