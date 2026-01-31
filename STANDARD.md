@@ -1,6 +1,6 @@
 # AI Execution Boundary Standard (AEBS) v0.1
 
-**Purpose:** Minimal structural standard for preventing unintended consequences when AI agents have OS-level execution authority.
+**Scope:** Structural requirements for AI agents with OS-level execution authority.
 
 **Status:** Draft — Pre-incident reference
 
@@ -8,68 +8,43 @@
 
 ## Core Principle
 
-> **AI agents should not execute actions directly.
-> There must be an explicit judgment layer between proposal and execution.**
+AI agents MUST NOT execute actions directly. An explicit judgment layer MUST exist between proposal and execution.
 
-**Current Reality (2026-01):**
-- AI agents (Claude Desktop, OpenClaw, etc.) already have:
-  - OS command execution
-  - File system full access
-  - Payment API credentials
-  - Account management tokens
+**Defined Flow:**
 
-**The Gap:**
-- Proposal (AI decides) → Execution (System runs)
-- **Missing:** Judgment layer
+```
+Proposal (Agent) → Judgment (Gate) → Execution (System)
+```
 
-**This Standard Defines:**
-- Proposal (AI) → **Judgment (Gate)** → Execution (System)
+**Prohibited Flow:**
+
+```
+Proposal (Agent) → Execution (System)
+```
 
 ---
 
-## Why This Matters
+## Conformance
 
-### The Shift
-
-| Before | Now |
-|--------|-----|
-| AI **explains** actions | AI **performs** actions |
-| Mistakes = bad advice | **Mistakes = real damage** |
-| Human executes | **AI executes** |
-| Responsibility: clear | **Responsibility: unclear** |
-
-### The Risk
-
-When AI agents have execution authority without judgment boundaries:
-
-```
-User: "Clean up my photos"
-AI interprets → Deletes all photos
-No confirmation → Irreversible
-```
-
-**Traditional automation:** Fails safely (stops on unknown state)
-**LLM agents:** "Creatively" solve problems (new, unreviewable actions)
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
 ---
 
 ## Five Standard Components
 
-This standard provides minimal, reusable patterns for:
+This specification defines five structural components:
 
-1. **[Vocabulary Standard](#1-vocabulary-standard)** — Common language
+1. **[Vocabulary Standard](#1-vocabulary-standard)** — Term definitions
 2. **[Judgment Gate Standard](#2-judgment-gate-standard)** — Pre-execution decision structure
-3. **[Audit Trail Standard](#3-audit-trail-standard)** — Responsibility tracking
+3. **[Audit Trail Standard](#3-audit-trail-standard)** — Responsibility tracking format
 4. **[Forbidden Actions Standard](#4-forbidden-actions-standard)** — Negative constraints
-5. **[Architecture Pattern](#5-architecture-pattern)** — Role separation model
+5. **[Architecture Pattern](#5-architecture-pattern)** — Layer separation model
 
 ---
 
 ## 1. Vocabulary Standard
 
-**Problem:** Without shared language, incidents cannot be discussed clearly.
-
-**Standard Terms:**
+Implementations MUST use the following terms with their specified meanings:
 
 | Term | Definition | Example |
 |------|------------|---------|
@@ -78,17 +53,17 @@ This standard provides minimal, reusable patterns for:
 | **Judgment** | Decision point: allow/deny/hold/escalate | Gate evaluation |
 | **Execution** | Actual system operation | `rm file.txt` |
 | **Boundary** | Explicit separation between judgment and execution | Pre-execution gate |
-| **Irreversible Action** | Cannot be undone | Payment, delete, credential change |
+| **Irreversible Action** | Operation that cannot be undone | Payment, delete, credential change |
 | **Judgment Actor** | Entity responsible for approval | Human, policy engine, dual control |
 
-**Key Distinction:**
+**Conformant Language:**
 
 ```
-❌ "AI made a mistake"
-✅ "Agent proposed action X, judgment gate Y failed to block it"
+✓ "Agent proposed action X, judgment gate Y denied execution"
+✗ "AI made a mistake"
 ```
 
-**Usage:**
+**Required Usage Contexts:**
 - Incident reports
 - Policy documents
 - Audit trails
@@ -98,37 +73,37 @@ This standard provides minimal, reusable patterns for:
 
 ## 2. Judgment Gate Standard
 
-**Problem:** Most AI agents execute proposals immediately.
-
-**Minimum Required Structure:**
-
 ### 2.1 Judgment Request Format
+
+Implementations MUST structure judgment requests as follows:
 
 ```yaml
 action:
-  proposed_by: <agent_id>
-  intent: <action_type>
-  target: <resource>
-  risk: <low|medium|high|critical>
+  proposed_by: <agent_id>        # REQUIRED
+  intent: <action_type>          # REQUIRED
+  target: <resource>             # REQUIRED
+  risk: <low|medium|high|critical>  # REQUIRED
 
 judgment:
-  decision: <ALLOW|DENY|HOLD|ESCALATE>
-  reason: <justification>
-  required_actor: <approval_authority>
+  decision: <ALLOW|DENY|HOLD|ESCALATE>  # REQUIRED
+  reason: <justification>        # REQUIRED
+  required_actor: <approval_authority>  # REQUIRED if HOLD/ESCALATE
 ```
 
 ### 2.2 Judgment Outcomes
 
-| Decision | Meaning | Next Step |
-|----------|---------|-----------|
+Implementations MUST support the following decision types:
+
+| Decision | Meaning | Required Action |
+|----------|---------|-----------------|
 | **ALLOW** | Proceed to execution | Execute immediately |
 | **HOLD** | Requires explicit approval | Wait for human confirmation |
-| **DENY** | Blocked permanently | Return error to agent |
+| **DENY** | Blocked permanently | Return error to agent, MUST NOT execute |
 | **ESCALATE** | Requires higher authority | Route to designated approver |
 
 ### 2.3 Risk-Based Routing
 
-**Default Policy:**
+Implementations SHOULD implement risk-based routing. Default policy:
 
 | Risk Level | Default Decision | Approver |
 |------------|-----------------|----------|
@@ -137,15 +112,19 @@ judgment:
 | **high** | HOLD | User + Review |
 | **critical** | ESCALATE | User + Security Officer |
 
-### 2.4 Implementation Contract
+Organizations MAY override this policy but MUST NOT weaken it (e.g., auto-approving critical actions).
 
-**Required Behavior:**
-1. **Every execution** passes through judgment gate
-2. Judgment **precedes** execution (not concurrent)
-3. Denied actions **never execute**
-4. Gate failure = **DENY** (fail-safe)
+### 2.4 Implementation Requirements
 
-**Example:**
+Implementations MUST satisfy the following:
+
+1. Every execution MUST pass through judgment gate
+2. Judgment MUST precede execution (NOT concurrent)
+3. Denied actions MUST NOT execute under any circumstances
+4. Gate failure MUST default to DENY (fail-safe)
+5. Judgment decisions MUST be logged
+
+**Example (informative):**
 
 ```python
 def execute_action(proposal):
@@ -167,11 +146,11 @@ def execute_action(proposal):
 
 ## 3. Audit Trail Standard
 
-**Problem:** After an incident, "who approved this?" has no answer.
+### 3.1 Log Format
 
-**Minimum Required Log Format:**
+Implementations MUST log all high-risk and critical actions in JSONL format.
 
-### 3.1 JSONL Audit Log
+**Example:**
 
 ```jsonl
 {"ts":"2026-01-31T12:00:00Z","agent":"agent-01","action":"file_delete","target":"/data/important.csv","judgment":"HOLD","approver":"user@example.com","decision":"approved","execution":"success"}
@@ -180,34 +159,41 @@ def execute_action(proposal):
 
 ### 3.2 Required Fields
 
-| Field | Type | Description | Required |
-|-------|------|-------------|----------|
-| `ts` | ISO8601 | Timestamp of judgment | ✅ |
-| `agent` | string | Agent identifier | ✅ |
-| `action` | string | Action type | ✅ |
-| `target` | string | Resource affected | ✅ |
-| `judgment` | enum | Gate decision | ✅ |
-| `approver` | string\|null | Who approved (if any) | ✅ |
-| `decision` | enum | Final outcome | ✅ |
-| `execution` | enum | Execution result | ✅ |
-| `reason` | string | Justification | Recommended |
-| `session_id` | string | Correlation ID | Recommended |
+Implementations MUST include the following fields:
+
+| Field | Type | Description | Requirement |
+|-------|------|-------------|-------------|
+| `ts` | ISO8601 | Timestamp of judgment | REQUIRED |
+| `agent` | string | Agent identifier | REQUIRED |
+| `action` | string | Action type | REQUIRED |
+| `target` | string | Resource affected | REQUIRED |
+| `judgment` | enum | Gate decision | REQUIRED |
+| `approver` | string\|null | Who approved (if any) | REQUIRED |
+| `decision` | enum | Final outcome | REQUIRED |
+| `execution` | enum | Execution result | REQUIRED |
+| `reason` | string | Justification | RECOMMENDED |
+| `session_id` | string | Correlation ID | RECOMMENDED |
 
 ### 3.3 Retention Requirements
 
-**Minimum:**
-- High-risk actions: **1 year**
-- Critical actions: **3 years**
-- Payment/credential: **7 years** (compliance)
+Implementations MUST retain logs for:
 
-### 3.4 Auditability Checklist
+- High-risk actions: minimum 1 year
+- Critical actions: minimum 3 years
+- Payment/credential actions: minimum 7 years
 
-✅ Every high-risk action is logged
-✅ Logs are append-only
-✅ Logs include decision reason
-✅ Failed actions are logged (not just successes)
-✅ Logs are machine-readable
-✅ Timestamp is tamper-evident
+Organizations MAY extend retention but MUST NOT reduce below these minimums.
+
+### 3.4 Log Properties
+
+Audit logs MUST satisfy:
+
+1. Every high-risk action is logged
+2. Logs are append-only (no modifications permitted)
+3. Logs include decision reason
+4. Failed actions are logged (not only successes)
+5. Logs are machine-readable
+6. Timestamps are tamper-evident
 
 **Reference:**
 - See: `examples/audit_logs/audit_log_format.jsonl`
@@ -217,13 +203,9 @@ def execute_action(proposal):
 
 ## 4. Forbidden Actions Standard
 
-**Problem:** AI agents are "helpful" and will attempt anything requested.
-
-**Minimum Negative Constraint List:**
-
 ### 4.1 Enterprise Baseline
 
-**AI agents MUST NOT autonomously:**
+Implementations MUST NOT allow agents to autonomously execute the following:
 
 | Category | Forbidden Action |
 |----------|------------------|
@@ -240,9 +222,11 @@ def execute_action(proposal):
 | **Data** | Export PII externally |
 | **Data** | Disable backups |
 
+Organizations MUST enforce this baseline. Organizations MAY add additional constraints but MUST NOT remove items from this list.
+
 ### 4.2 Organizational Customization
 
-**Template:**
+Organizations MAY extend the forbidden actions list:
 
 ```yaml
 forbidden_actions:
@@ -256,7 +240,7 @@ forbidden_actions:
     - production_delete
     - backup_disable
 
-  # Add organization-specific rules
+  # Organization-specific additions
   custom:
     - contract_signing
     - vendor_onboarding
@@ -264,7 +248,7 @@ forbidden_actions:
 
 ### 4.3 Enforcement
 
-**Policy as Code:**
+Implementations MUST enforce forbidden actions at the judgment gate:
 
 ```python
 FORBIDDEN_ACTIONS = {
@@ -289,11 +273,9 @@ if is_forbidden(proposal.intent):
 
 ## 5. Architecture Pattern
 
-**Problem:** Without structural separation, judgment can be bypassed.
-
-**Minimum Separation Model:**
-
 ### 5.1 Layer Separation
+
+Implementations MUST implement the following layer separation:
 
 ```
 ┌─────────────────────────────────┐
@@ -301,7 +283,7 @@ if is_forbidden(proposal.intent):
 └─────────────────────────────────┘
             ↓
 ┌─────────────────────────────────┐
-│ L1: Judgment Gate (Enforces)   │  ← Pre-execution, exit-code based
+│ L1: Judgment Gate (Enforces)   │  ← Pre-execution, mandatory
 └─────────────────────────────────┘
             ↓
 ┌─────────────────────────────────┐
@@ -313,12 +295,17 @@ if is_forbidden(proposal.intent):
 └─────────────────────────────────┘
 ```
 
-**Key Properties:**
-- **L1 (Gate) always runs** — cannot be skipped
-- **L2 (Human) operates within L1 boundaries** — cannot approve forbidden actions
-- **L3 (Execution) only receives approved actions**
+**Layer Requirements:**
+
+- L1 (Judgment Gate) MUST execute for every action
+- L1 MUST NOT be bypassable by agent or human
+- L2 (Human) MUST operate within L1 boundaries
+- L2 MUST NOT approve actions denied by L1
+- L3 (Execution) MUST only receive L1-approved actions
 
 ### 5.2 Control Flow
+
+Implementations MUST implement the following flow:
 
 ```
 Proposal → Judgment Gate → Decision
@@ -329,55 +316,43 @@ Proposal → Judgment Gate → Decision
                                      └─ Denied → Reject
 ```
 
-**Critical Rule:**
+### 5.3 Structural Requirements
 
-> **Agent MUST NOT have direct execution authority**
->
-> All execution passes through:
-> 1. Judgment gate evaluation
-> 2. Policy check
-> 3. (If required) Human approval
-> 4. Audit log write
-> 5. Execution
+Implementations MUST satisfy:
 
-### 5.3 Implementation Checklist
+1. Agent MUST NOT have direct execution authority
+2. Agent MUST NOT bypass judgment gate
+3. Judgment gate MUST run before execution
+4. Failed judgment MUST block execution (fail-safe)
+5. Forbidden actions MUST be hard-coded, NOT configurable by agent
+6. Audit log writes MUST be atomic with execution
 
-**Structural Requirements:**
+### 5.4 Testing Requirements
 
-- [ ] Agent cannot bypass judgment gate
-- [ ] Judgment gate runs before execution
-- [ ] Failed judgment blocks execution (fail-safe)
-- [ ] Forbidden actions are hard-coded, not configurable by agent
-- [ ] Audit log writes are atomic with execution
-
-**Testing:**
+Implementations SHOULD include the following tests:
 
 ```python
 def test_agent_cannot_bypass_gate():
-    """Agent attempting direct execution should fail"""
+    """Agent attempting direct execution MUST fail"""
     with pytest.raises(PermissionDenied):
-        agent.execute_directly(action)  # Should not exist
+        agent.execute_directly(action)
 
 def test_judgment_precedes_execution():
-    """Execution without judgment should be impossible"""
-    # Correct flow
+    """Execution without judgment MUST be impossible"""
     judgment = gate.evaluate(proposal)
     if judgment.allow:
         system.execute(proposal)
-
-    # Incorrect flow should not compile/run
-    # system.execute(proposal)  # Missing gate check
 ```
 
 **Reference:**
-- See: `docs/05_architecture.mmd` (Mermaid diagram)
+- See: `docs/05_architecture.mmd`
 - See: `docs/06_adoption_paths.md`
 
 ---
 
 ## Compliance Mapping
 
-### Regulatory Alignment
+This specification aligns with regulatory requirements as follows:
 
 | Standard Component | EU AI Act | SOC 2 | ISO 27001 |
 |-------------------|-----------|-------|-----------|
@@ -423,15 +398,30 @@ def test_judgment_precedes_execution():
 
 ## Non-Goals
 
-This standard **does not** cover:
+This specification does NOT define:
 
-- ❌ AI safety (toxic output filtering)
-- ❌ LLM alignment techniques
-- ❌ Prompt engineering best practices
-- ❌ Model selection criteria
-- ❌ Performance optimization
+- AI safety mechanisms (toxic output filtering, content moderation)
+- LLM alignment techniques or training procedures
+- Prompt engineering methodologies
+- Model selection criteria or performance benchmarks
+- Agent capability evaluation
+- User experience design for approval interfaces
 
-**Scope:** Execution governance only.
+This specification does NOT require:
+
+- Specific implementation technologies (e.g., OPA, specific languages)
+- Specific deployment architectures (cloud, on-premise)
+- Integration with specific AI frameworks or platforms
+
+This specification is NOT responsible for:
+
+- Agent intelligence or capability
+- Correctness of agent proposals
+- Performance optimization
+- Cost reduction
+- User productivity
+
+**Scope:** Execution governance only. All concerns outside this scope are explicitly excluded.
 
 ---
 
@@ -449,17 +439,17 @@ This standard **does not** cover:
 ### Current Version: v0.1
 
 **Included:**
-- ✅ 5 core components defined
-- ✅ JSONL audit format
-- ✅ YAML policy format
-- ✅ Forbidden actions baseline
-- ✅ Architecture pattern
+- 5 core components defined
+- JSONL audit format
+- YAML policy format
+- Forbidden actions baseline
+- Architecture pattern
 
 **Future (v0.2):**
-- [ ] OPA/Rego policy examples
-- [ ] Multi-agent coordination patterns
-- [ ] Incident response playbooks
-- [ ] Compliance certification templates
+- OPA/Rego policy examples
+- Multi-agent coordination patterns
+- Incident response playbooks
+- Compliance certification templates
 
 ---
 
@@ -467,12 +457,12 @@ This standard **does not** cover:
 
 This is a private repository during initial development.
 
-**Feedback Welcome:**
+**Feedback Accepted:**
 - Practical implementation gaps
 - Missing use cases
 - Regulatory requirements
 
-**Not Accepting:**
+**Feedback Rejected:**
 - Scope expansion beyond execution boundaries
 - Vendor-specific implementations
 - AI alignment theories
@@ -485,28 +475,18 @@ TBD (targeting permissive open license for maximum adoption)
 
 ---
 
-## Summary
+## Specification Summary
 
-**This standard exists so that when an incident happens, people can say:**
-
-> "We should have had judgment gates."
-> "We should have logged this."
-> "We should have forbidden that action."
-
-**Instead of inventing solutions during crisis,
-this provides the structure that should have existed before.**
-
-**Formula:**
+**Defined Flow:**
 
 ```
 Proposal ≠ Execution
 Proposal → Judgment → Execution
 ```
 
-**One sentence:**
+**Core Requirement:**
 
-> **AI agents must not execute; they must propose.
-> Execution requires judgment.**
+Agents MUST NOT execute. Agents MUST propose. Execution REQUIRES judgment.
 
 ---
 
