@@ -25,7 +25,7 @@ This **is**:
 ## Why This Exists
 
 Current state (2026-01):
-- AI agents (OpenClaw, Claude Desktop, etc.) already have:
+- AI agents with OS-level execution authority already have:
   - OS command execution
   - File system access
   - Payment API access
