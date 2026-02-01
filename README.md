@@ -1,5 +1,16 @@
 # AI Execution Boundary Specification
 
+## Position
+
+This repository is part of the **Judgment Boundary** work:
+a set of experiments and specifications focused on
+*when AI systems must stop or not execute*.
+
+See the overarching map:
+→ https://github.com/Nick-heo-eg/stop-first-rag/blob/main/JUDGMENT_BOUNDARY_MANIFEST.md
+
+---
+
 **Status:** Draft v0.1
 **Purpose:** Minimal structural standard for AI agent execution governance
 
