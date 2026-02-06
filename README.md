@@ -68,6 +68,30 @@ Proposal (AI) → Execution (System)
 
 ---
 
+## Execution OS Clarification
+
+**What Execution OS does:**
+- Executes approved actions exactly as specified
+- Produces tamper-evident evidence of execution
+- Returns execution receipts
+
+**What Execution OS does NOT do:**
+- ❌ Does NOT decide whether an action should occur
+- ❌ Does NOT issue approvals
+- ❌ Does NOT judge executability
+- ❌ Does NOT retry or branch on failure
+- ❌ Does NOT infer parameters
+
+**Critical distinctions:**
+- Execution OS is **not an agent**
+- Execution OS has **no autonomy**
+- Execution OS is **powerful precisely because it is stupid**
+
+For architectural context, see:
+[Three-Layer Architecture](https://github.com/Nick-heo-eg/execution-governance-spec/blob/master/ARCHITECTURE_THREE_LAYER.md)
+
+---
+
 ## Five Standard Components
 
 This spec provides minimal patterns for:
