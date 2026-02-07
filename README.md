@@ -1,5 +1,9 @@
 # AI Execution Boundary Specification
 
+![v0.1 SEALED](https://img.shields.io/badge/v0.1-SEALED-green?style=flat-square)
+![Two Independent Proofs](https://img.shields.io/badge/Proofs-2%20Independent-blue?style=flat-square)
+![Judgment Boundary Spec](https://img.shields.io/badge/Spec-Runtime%20Agnostic-purple?style=flat-square)
+
 > ⚠️ **This is not about AI safety.**
 >
 > It is about **execution authority**.
