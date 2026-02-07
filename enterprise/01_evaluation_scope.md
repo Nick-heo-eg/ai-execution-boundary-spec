@@ -1,4 +1,4 @@
-# PoC Scope
+# Evaluation Scope
 
 Included:
 - Payment / credential / file-delete scenarios

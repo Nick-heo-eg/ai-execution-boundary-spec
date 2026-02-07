@@ -1,4 +1,4 @@
-# Enterprise Adoption Checklist
+# Organizational Evaluation Checklist
 - [ ] Judgment layer implemented
 - [ ] Default HOLD for high-risk actions
 - [ ] Human approval for payments/credentials

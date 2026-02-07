@@ -1,4 +1,4 @@
-# Success Metrics
+# Validation Signals
 
 - % of risky actions blocked
 - Human approval response time

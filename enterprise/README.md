@@ -1,9 +1,17 @@
-# EJGB Enterprise PoC Kit v0.1 (2-Week)
+# EJGB Organizational Evaluation Reference v0.1
 
-**Goal**
-Validate EJGB in a real enterprise environment within 2 weeks.
+> ⚠️ **Non-Normative Reference Materials**
+>
+> This directory contains illustrative materials for evaluating execution
+> boundary behavior in organizational or regulated environments.
+>
+> These documents do not represent timelines, guarantees, or commercial offerings.
 
-**PoC Success Criteria**
+**Purpose**
+
+Provide reference patterns for validating EJGB behavior in real environments.
+
+**Evaluation Objectives**
 - Irreversible actions are blocked by default
 - Human approval flow is enforced
 - Audit evidence is generated
