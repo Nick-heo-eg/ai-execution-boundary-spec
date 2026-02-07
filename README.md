@@ -217,6 +217,26 @@ This is deliberately **minimal**. Additional layers can be added, but these five
 
 ---
 
+## Scope Clarification (Non-Normative)
+
+This repository intentionally does **not** attempt to:
+
+- Demonstrate real-world safety effectiveness
+- Provide large-scale production validation
+- Optimize false-positive / false-negative rates
+- Defend against all prompt-level bypass strategies
+- Maximize automation or minimize human approvals
+
+Version v0.1 answers one question only:
+
+> Does a structurally independent judgment occur *before* execution,
+> and can that prevention be explicitly proven?
+
+Operational usability, policy tuning, attack hardening,
+and workflow optimization are explicitly **out of scope** for this version.
+
+---
+
 ## Contributing
 
 This is a private repository during initial development.
