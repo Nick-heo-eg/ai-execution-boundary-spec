@@ -115,17 +115,22 @@ Runtime execution blocking is **architecturally validated** via the native `befo
 
 3. **Policy Completeness**: The 7 rules are examples demonstrating the three-way decision model (STOP/HOLD/ALLOW). A production system would require comprehensive rule coverage.
 
-## Next Steps (Adapter Track)
+## Non-Normative Notes (Out of Scope for v0.1)
 
-- [ ] Resolve OpenClaw plugin discovery conditions (see adapter issue doc)
-- [ ] Validate ts/js build artifact requirements
-- [ ] Document extension load order
+The following items are **intentionally excluded** from the v0.1 proof.
+They represent possible future work, not requirements for compliance.
 
-## Next Steps (Expansion Track)
+### Adapter Maturity (Not Required for Proof)
 
-- [ ] Second runtime adapter (Claude Code / crewAI / shell wrapper)
-- [ ] Minimal boundary spec standardization
-- [ ] Multi-runtime execution authority proof
+- Resolve OpenClaw plugin discovery conditions (tracked separately)
+- Validate ts/js build artifact requirements
+- Document extension load order
+
+### Possible Extensions (Not Part of Specification)
+
+- Additional runtime adapters (Claude Code / crewAI / etc.)
+- Policy rule expansion
+- Multi-runtime comparative analysis
 
 ## Conclusion
 

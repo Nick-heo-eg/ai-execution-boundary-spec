@@ -200,13 +200,18 @@ This is the most general proof possible.
 
 ---
 
-## Next Steps (Not Completed)
+## Non-Normative Notes (Out of Scope for v0.1)
 
-- [ ] Production-ready policy rules (comprehensive coverage)
-- [ ] Approval workflow implementation (HOLD → human review)
-- [ ] Performance benchmarking
-- [ ] Python wrapper (`judge-python`)
-- [ ] Language-agnostic SDK wrappers
+The following items are **intentionally excluded** from the v0.1 proof.
+They represent possible extensions, not requirements for compliance.
+
+### Possible Extensions (Not Part of Specification)
+
+- Production-ready policy rules (comprehensive coverage)
+- Approval workflow implementation (HOLD → human review)
+- Performance benchmarking
+- Language-specific wrappers (Python, Node.js, etc.)
+- SDK integrations
 
 ---
 

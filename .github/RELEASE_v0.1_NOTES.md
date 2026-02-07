@@ -158,13 +158,18 @@ cat audit.jsonl | jq .            # Audit log
 
 ---
 
-## Next Steps (Not In This Release)
+## Non-Normative Notes (Out of Scope for v0.1)
 
-- [ ] OpenClaw plugin discovery resolution
-- [ ] Production policy rule expansion
-- [ ] Third runtime adapter (Claude Code MCP / Python)
-- [ ] Approval workflow implementation (HOLD → human review)
-- [ ] Performance benchmarking
+The following items are **intentionally excluded** from this release.
+They represent possible future work, not requirements for v0.1 compliance.
+
+- OpenClaw adapter maturity (plugin discovery)
+- Production policy rule expansion
+- Additional runtime adapters (Claude Code MCP / Python)
+- Approval workflow implementation (HOLD → human review)
+- Performance benchmarking
+
+**v0.1 proves the boundary exists. Extensions prove its generality.**
 
 ---
 
