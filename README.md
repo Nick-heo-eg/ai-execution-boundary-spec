@@ -1,37 +1,87 @@
 # AI Execution Boundary Specification
 
-## Position
-
-This repository is part of the **Judgment Boundary** work:
-a set of experiments and specifications focused on
-*when AI systems must stop or not execute*.
-
-See the overarching map:
-→ https://github.com/Nick-heo-eg/stop-first-rag/blob/master/JUDGMENT_BOUNDARY_MANIFEST.md
-
----
-
-**Status:** Draft v0.1
-**Purpose:** Minimal structural standard for AI agent execution governance
-
-This repository defines structural constraints for separating judgment from execution, independent of model behavior.
+> ⚠️ **This is not about AI safety.**
+>
+> It is about **execution authority**.
+>
+> AI systems can reason freely.
+> Execution is a separate concern.
 
 ---
 
 ## What This Is
 
-A specification for the **minimum structural requirements** that must exist when AI agents have OS-level execution authority.
+This repository defines and proves an **Execution Authority Boundary**.
+
+It answers a single question:
+
+> **Can execution be structurally prevented BEFORE it happens,
+> without modifying the model?**
+
+**Answer:** Yes. Proven twice.
+
+---
+
+## What Is Proven
+
+- Judgment occurs **before execution**
+- Decisions are **STOP / HOLD / ALLOW**
+- Unknown cases **fail-closed (HOLD)**
+- Execution prevention emits an **audit signal**
+- The model is untouched
+
+---
+
+## Proven Implementations
+
+### 1. OpenClaw Plugin — Framework-Level Interception
+
+- **Hook:** `before_tool_call`
+- **Tests:** 6/6 automated tests passed
+- **Status:** ✅ v0.1 COMPLIANT
+- **Evidence:** `examples/openclaw/proof/EXECUTION_PREVENTION_PROOF.md`
+
+### 2. Shell Wrapper — Universal, Runtime-Agnostic
+
+- **Hook:** Bash wrapper (`judge-exec`)
+- **Tests:** Manual validation (STOP/HOLD/ALLOW)
+- **Dependencies:** Zero (bash only)
+- **Status:** ✅ v0.1 COMPLIANT
+- **Evidence:** `examples/shell-boundary/proof/SHELL_WRAPPER_PROOF.md`
+
+Both implementations comply with:
+📄 **`JUDGMENT_BOUNDARY_MINIMAL_SPEC.md`** (Runtime-agnostic standard)
+
+---
+
+## What This Is NOT
 
 This is **not**:
-- A compliance framework
-- A regulatory guideline
-- AI safety filtering
-- A specific product
+- AI safety
+- Guardrails
+- Prompt filtering
+- Post-hoc monitoring
+- Compliance framework
+- Regulatory guideline
 
-This **is**:
-- The structural boundaries that should exist before an incident makes them mandatory
-- A reference for "what we should have had in place"
-- A vocabulary and pattern library for execution governance
+This **is** execution authority.
+
+---
+
+## Status
+
+**Release:** v0.1 (2026-02-08)
+**Scope:** Judgment Logic & Pre-Execution Blocking
+**Proven:** Two independent implementations
+
+---
+
+## Background
+
+This repository is part of the **Judgment Boundary** research:
+→ https://github.com/Nick-heo-eg/stop-first-rag/blob/master/JUDGMENT_BOUNDARY_MANIFEST.md
+
+**Purpose:** Define minimum structural requirements for AI agent execution governance
 
 ---
 
