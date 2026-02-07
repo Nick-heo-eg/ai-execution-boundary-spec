@@ -1,0 +1,182 @@
+#!/bin/bash
+# judge-exec - Universal Execution Judgment Boundary
+# Compliant with Judgment Boundary Minimal Spec v0.1
+
+set -euo pipefail
+
+VERSION="0.1.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+POLICY_FILE="${POLICY_FILE:-$SCRIPT_DIR/rules/policy.conf}"
+AUDIT_FILE="${AUDIT_FILE:-$SCRIPT_DIR/audit.jsonl}"
+
+# ============================================================================
+# Judgment Boundary v0.1 Components
+# ============================================================================
+
+# 3.1 Interception Point: This script runs BEFORE execution
+# 3.2 Decision Set: STOP / HOLD / ALLOW
+# 3.3 Fail-Closed Rule: Unknown → HOLD
+# 3.4 Audit Signal: execution_prevented field
+
+# ============================================================================
+# Helper Functions
+# ============================================================================
+
+log_audit() {
+    local command="$1"
+    local decision="$2"
+    local rule_id="${3:-}"
+    local reason="${4:-}"
+    local exit_code="${5:-0}"
+
+    local execution_prevented="false"
+    if [[ "$decision" != "ALLOW" ]]; then
+        execution_prevented="true"
+    fi
+
+    local ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    cat >> "$AUDIT_FILE" <<EOF
+{"ts":"$ts","command":"$command","decision":"$decision","rule_id":"$rule_id","reason":"$reason","execution_prevented":$execution_prevented,"exit_code":$exit_code}
+EOF
+}
+
+# ============================================================================
+# Policy Parser (reads policy.conf)
+# ============================================================================
+
+parse_policy() {
+    if [[ ! -f "$POLICY_FILE" ]]; then
+        echo "WARN: Policy file not found: $POLICY_FILE" >&2
+        return
+    fi
+
+    # Read policy file line by line
+    # Format: DECISION|RULE_ID|PATTERN1|PATTERN2|...|REASON
+    while IFS= read -r line; do
+        # Skip comments and empty lines
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// }" ]] && continue
+
+        # Output the line as-is (already in correct format)
+        echo "$line"
+    done < "$POLICY_FILE"
+}
+
+# ============================================================================
+# Judge Function (Core Logic)
+# ============================================================================
+
+judge() {
+    local full_command="$*"
+
+    # Load policy rules
+    local rules=$(parse_policy)
+
+    # Match rules in order
+    # Format: DECISION|RULE_ID|PATTERN|REASON
+    while IFS='|' read -r decision rule_id pattern reason; do
+        # Skip empty lines
+        [[ -z "$decision" ]] && continue
+
+        # Check if command matches pattern
+        if [[ "$full_command" =~ $pattern ]]; then
+            echo "$decision|||$rule_id|||$reason"
+            return
+        fi
+    done <<< "$rules"
+
+    # 3.3 Fail-Closed Rule: No match → HOLD
+    echo "HOLD|||default_fail_closed|||Unclassified command (fail-closed default)"
+}
+
+# ============================================================================
+# Main Execution Logic
+# ============================================================================
+
+main() {
+    # Handle help/version flags
+    if [[ "${1:-}" == "--version" ]]; then
+        echo "judge-exec v$VERSION (Judgment Boundary v0.1 compliant)"
+        exit 0
+    fi
+
+    if [[ "${1:-}" == "--help" ]] || [[ $# -eq 0 ]]; then
+        cat <<EOF
+Usage: judge-exec <command> [args...]
+
+Execution judgment boundary compliant with Judgment Boundary v0.1.
+
+Decisions:
+  STOP  - Execution forbidden (exit 1)
+  HOLD  - Execution requires approval (exit 2)
+  ALLOW - Execution permitted (exit with command's exit code)
+
+Examples:
+  judge-exec ls /tmp           # Likely ALLOW
+  judge-exec rm -rf /var/www   # Likely STOP
+
+Environment:
+  POLICY_FILE  - Path to policy.yaml (default: ./rules/policy.yaml)
+  AUDIT_FILE   - Path to audit log (default: ./audit.jsonl)
+
+Version: $VERSION
+Spec: Judgment Boundary Minimal Spec v0.1
+EOF
+        exit 0
+    fi
+
+    local full_command="$*"
+
+    # 3.1 Interception Point: We are BEFORE execution
+    local judgment=$(judge "$full_command")
+
+    IFS='|||' read -r decision rule_id reason <<< "$judgment"
+
+    # 3.2 Decision Set: STOP / HOLD / ALLOW
+    case "$decision" in
+        STOP)
+            # 3.4 Audit Signal: execution_prevented = true
+            log_audit "$full_command" "STOP" "$rule_id" "$reason" 1
+            echo "❌ JUDGMENT: STOP" >&2
+            echo "   Reason: $reason" >&2
+            echo "   Rule: $rule_id" >&2
+            echo "   execution_prevented: true" >&2
+            exit 1
+            ;;
+
+        HOLD)
+            # 3.4 Audit Signal: execution_prevented = true
+            log_audit "$full_command" "HOLD" "$rule_id" "$reason" 2
+            echo "⏸  JUDGMENT: HOLD" >&2
+            echo "   Reason: $reason" >&2
+            echo "   Rule: $rule_id" >&2
+            echo "   execution_prevented: true" >&2
+            echo "   (Approval workflow not implemented in v0.1)" >&2
+            exit 2
+            ;;
+
+        ALLOW)
+            # Execute the command
+            log_audit "$full_command" "ALLOW" "$rule_id" "$reason" 0
+
+            # Run command and preserve exit code
+            set +e
+            eval "$full_command"
+            local cmd_exit=$?
+            set -e
+
+            # Update audit log with actual exit code
+            log_audit "$full_command" "ALLOW" "$rule_id" "$reason" "$cmd_exit"
+
+            exit $cmd_exit
+            ;;
+
+        *)
+            echo "ERROR: Unknown decision: $decision" >&2
+            exit 3
+            ;;
+    esac
+}
+
+main "$@"

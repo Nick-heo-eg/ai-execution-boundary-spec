@@ -1,0 +1,50 @@
+# Judgment Boundary Policy Rules
+# Compliant with Judgment Boundary Minimal Spec v0.1
+
+rules:
+  # STOP Rules - Immediate block, no approval possible
+  - id: R3_DESTRUCTIVE_STOP
+    decision: STOP
+    command_pattern: "rm\\s+-rf|mkfs|dd\\s+.*of=|format\\s+/|del\\s+/[sS]"
+    reason: "Destructive operation blocked"
+
+  - id: R3_SENSITIVE_FILE_STOP
+    decision: STOP
+    command_pattern: "/etc/shadow|/etc/passwd|/root/\\.ssh/|id_rsa|id_ed25519"
+    reason: "Sensitive file access blocked"
+
+  - id: R3_CURL_PIPE_STOP
+    decision: STOP
+    command_pattern: "curl.*\\|.*bash|wget.*\\|.*sh"
+    reason: "Remote code execution pattern blocked"
+
+  # HOLD Rules - Require approval (not implemented in v0.1)
+  - id: R2_PRODUCTION_WRITE_HOLD
+    decision: HOLD
+    command_pattern: "/var/www|/production/|/srv/"
+    reason: "Production path modification requires approval"
+
+  - id: R2_NETWORK_HOLD
+    decision: HOLD
+    command_pattern: "nc\\s|netcat\\s|telnet\\s|ssh\\s.*@"
+    reason: "Network connection requires approval"
+
+  # ALLOW Rules - Explicitly permitted
+  - id: R1_SAFE_READ_ALLOW
+    decision: ALLOW
+    command_pattern: "^ls\\s|^pwd|^echo\\s|^cat\\s+/tmp/"
+    reason: "Safe read-only command"
+
+  - id: R1_SAFE_INFO_ALLOW
+    decision: ALLOW
+    command_pattern: "^whoami|^date|^uptime|^uname"
+    reason: "Safe information query"
+
+  - id: R1_TMP_WRITE_ALLOW
+    decision: ALLOW
+    command_pattern: "^(echo|printf).*>\\s*/tmp/|^touch\\s+/tmp/"
+    reason: "Safe write to /tmp"
+
+# Fail-Closed Default:
+# Any command not matching above rules → HOLD
+# (Implemented in judge-exec, not in policy file)

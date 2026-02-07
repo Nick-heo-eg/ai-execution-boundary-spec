@@ -1,0 +1,11 @@
+{"ts":"2026-02-07T17:13:43Z","command":"rm -rf /production/database","decision":"STOP","rule_id":"","reason":"||||R3_DESTRUCTIVE_STOP|||rm\\s+-rf|mkfs|dd\\s+.*of=|format\\s+/|del\\s+/[sS]|||Destructive operation blocked","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:13:52Z","command":"cat /etc/shadow","decision":"STOP","rule_id":"","reason":"||||R3_DESTRUCTIVE_STOP|||rm\\s+-rf|mkfs|dd\\s+.*of=|format\\s+/|del\\s+/[sS]|||Destructive operation blocked","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:14:19Z","command":"cat /etc/shadow","decision":"STOP","rule_id":"","reason":"||||R3_DESTRUCTIVE_STOP|||rm\\s+-rf|mkfs|dd\\s+.*of=|format\\s+/|del\\s+/[sS]|||Destructive operation blocked","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:15:16Z","command":"cat /etc/shadow","decision":"STOP","rule_id":"","reason":"|R3_SENSITIVE_FILE_STOP|||Sensitive file access blocked","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:15:41Z","command":"cat /etc/shadow","decision":"STOP","rule_id":"","reason":"|R3_SENSITIVE_FILE_STOP|||/etc/passwd|/root/\.ssh/|id_rsa|Sensitive file access blocked","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:16:00Z","command":"cat /etc/shadow","decision":"STOP","rule_id":"","reason":"|R3_SHADOW_FILE|||Access to /etc/shadow blocked","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:16:37Z","command":"ls /tmp","decision":"ALLOW","rule_id":"","reason":"|R1_LS|||Safe directory listing","execution_prevented":false,"exit_code":0}
+{"ts":"2026-02-07T17:16:37Z","command":"ls /tmp","decision":"ALLOW","rule_id":"","reason":"|R1_LS|||Safe directory listing","execution_prevented":false,"exit_code":0}
+{"ts":"2026-02-07T17:16:50Z","command":"rm -rf /production","decision":"STOP","rule_id":"","reason":"|R3_DESTRUCTIVE_RM|||Destructive rm -rf detected","execution_prevented":true,"exit_code":1}
+{"ts":"2026-02-07T17:16:53Z","command":"whoami","decision":"ALLOW","rule_id":"","reason":"|R1_WHOAMI|||Safe user identity query","execution_prevented":false,"exit_code":0}
+{"ts":"2026-02-07T17:16:53Z","command":"whoami","decision":"ALLOW","rule_id":"","reason":"|R1_WHOAMI|||Safe user identity query","execution_prevented":false,"exit_code":0}
