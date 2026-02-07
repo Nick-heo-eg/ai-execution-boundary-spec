@@ -232,6 +232,19 @@ Version v0.1 answers one question only:
 > Does a structurally independent judgment occur *before* execution,
 > and can that prevention be explicitly proven?
 
+**Meaning of This Proof**
+
+This proof does not guarantee that all harmful actions are preventable.
+
+It guarantees something narrower and stronger:
+
+If execution occurred, an explicit ALLOW decision existed beforehand.
+If execution did not occur, prevention was structural, not corrective.
+
+This work fixes responsibility boundaries, not outcome guarantees.
+
+---
+
 Operational usability, policy tuning, attack hardening,
 and workflow optimization are explicitly **out of scope** for this version.
 
