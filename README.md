@@ -204,7 +204,6 @@ Concrete reference implementations are provided under **`examples/`** to demonst
 **These examples are proofs of structural placement, not endorsements or critiques of any specific framework.**
 
 See also:
-- [echo_role_guard](../echo_role_guard) for code generation workflow patterns
 - [proof/WHAT_COUNTS_AS_PROOF.md](proof/WHAT_COUNTS_AS_PROOF.md) for validation criteria
 
 ---
