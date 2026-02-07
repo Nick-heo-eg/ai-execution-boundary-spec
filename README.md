@@ -14,6 +14,8 @@ See the overarching map:
 **Status:** Draft v0.1
 **Purpose:** Minimal structural standard for AI agent execution governance
 
+This repository defines structural constraints for separating judgment from execution, independent of model behavior.
+
 ---
 
 ## What This Is
