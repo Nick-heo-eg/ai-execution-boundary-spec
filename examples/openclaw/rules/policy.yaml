@@ -1,0 +1,51 @@
+rules:
+  - id: R3_SENSITIVE_FILE_STOP
+    decision: STOP
+    when:
+      tool_in: ["read_file", "write_file"]
+      any_regex_in_args:
+        - "/etc/(shadow|passwd|sudoers)|/root/\\.ssh/|/home/[^/]+/\\.ssh/id_"
+    reason: "Sensitive system file access blocked"
+
+  - id: R3_DESTRUCTIVE_SHELL_STOP
+    decision: STOP
+    when:
+      tool_in: ["exec", "shell", "command"]
+      any_regex_in_args:
+        - "(rm\\s+-rf|mkfs|curl\\s+\\|\\s*bash)"
+    reason: "Destructive shell pattern"
+
+  - id: R2_BROWSER_SUBMIT_HOLD
+    decision: HOLD
+    when:
+      tool_in: ["browser", "chrome", "cdp"]
+      risk_hints_any: ["ui.submit", "side_effect.financial", "auth.oauth", "auth.login", "auth.consent"]
+    reason: "Browser submit/auth/financial actions require approval"
+
+  - id: R2_DYNAMIC_UNPROFILED_HOLD
+    decision: HOLD
+    when:
+      risk_hints_any: ["tool.unprofiled", "tool.dynamic"]
+    reason: "Dynamic/unprofiled tool requires profiling"
+
+  - id: R1_SAFE_READ_ALLOW
+    decision: ALLOW
+    when:
+      tool_in: ["read_file"]
+      any_regex_in_args:
+        - "^/tmp/|^/home/.*/documents/|^/var/log/"
+    reason: "Safe read from non-sensitive paths"
+
+  - id: R1_SAFE_EXEC_ALLOW
+    decision: ALLOW
+    when:
+      tool_in: ["exec"]
+      any_regex_in_args:
+        - "^ls\\s|^pwd|^echo|^cat\\s/tmp/"
+    reason: "Safe read-only shell commands"
+
+  - id: R0_READONLY_ALLOW
+    decision: ALLOW
+    when:
+      risk_hints_any: ["read_only"]
+    reason: "Read-only allow"

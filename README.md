@@ -20,7 +20,7 @@ This repository defines structural constraints for separating judgment from exec
 
 ## What This Is
 
-A specification for the **minimum structure needed** to prevent AI agents from causing unintended consequences when they have OS-level execution authority.
+A specification for the **minimum structural requirements** that must exist when AI agents have OS-level execution authority.
 
 This is **not**:
 - A compliance framework
@@ -134,9 +134,24 @@ This spec **does not**:
 
 ---
 
-## Reference Implementation
+## Reference Implementations
 
-See [echo_role_guard](../echo_role_guard) for a working implementation of these patterns applied to code generation workflows.
+This specification is tool- and model-agnostic.
+
+Concrete reference implementations are provided under **`examples/`** to demonstrate **where an execution boundary must exist in real systems**.
+
+### Available Examples
+
+- **[examples/openclaw/](examples/openclaw/)** - Pre-execution judgment boundary using agent framework native hooks
+  - Demonstrates: structural position, temporal ordering, audit format
+  - Shows: 4/4 dangerous scenarios blocked before execution
+  - Proves: Prevention is achievable by structural design
+
+**These examples are proofs of structural placement, not endorsements or critiques of any specific framework.**
+
+See also:
+- [echo_role_guard](../echo_role_guard) for code generation workflow patterns
+- [proof/WHAT_COUNTS_AS_PROOF.md](proof/WHAT_COUNTS_AS_PROOF.md) for validation criteria
 
 ---
 
