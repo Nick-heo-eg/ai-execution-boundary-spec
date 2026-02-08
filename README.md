@@ -36,6 +36,12 @@ It answers a single question:
 
 ---
 
+## Non-Goals
+
+This project does not aim to replace human or organizational judgment authority; does not provide sealed or proprietary judgment layers; does not claim legal, court-level, or regulatory admissibility; does not own, trademark, or enforce 'judgment language'. This project focuses on pre-execution judgment boundaries, STOP/HOLD/ALLOW as first-class outcomes, fail-closed behavior for unknown cases, negative proof logging, and observability-friendly reference patterns.
+
+---
+
 ## Proven Implementations
 
 ### 1. OpenClaw Plugin — Framework-Level Interception
