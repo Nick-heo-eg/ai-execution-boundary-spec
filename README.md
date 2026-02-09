@@ -102,8 +102,7 @@ This **is** execution authority.
 
 ## Background
 
-This repository is part of the **Judgment Boundary** research:
-→ https://github.com/Nick-heo-eg/stop-first-rag/blob/master/JUDGMENT_BOUNDARY_MANIFEST.md
+**This repository is a standalone specification that defines and proves execution authority boundaries for AI agent systems.**
 
 **Purpose:** Define minimum structural requirements for AI agent execution governance
 
