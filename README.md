@@ -21,6 +21,14 @@ Questions discussions and critical review are welcome via GitHub Issues This rep
 
 ---
 
+> ⚠️ **Non-Operational Specification**
+>
+> This repository contains reference specifications and proof artifacts.
+> Code examples exist to illustrate structural boundaries, not for production deployment.
+> See individual example directories for usage restrictions.
+
+---
+
 ## What This Is
 
 This repository defines and proves an **Execution Authority Boundary**.
@@ -162,9 +170,6 @@ Proposal (AI) → Execution (System)
 - Execution OS has **no autonomy**
 - Execution OS is **powerful precisely because it is stupid**
 
-For architectural context, see:
-[Three-Layer Architecture](https://github.com/Nick-heo-eg/execution-governance-spec/blob/master/ARCHITECTURE_THREE_LAYER.md)
-
 ---
 
 ## Five Standard Components
@@ -215,10 +220,11 @@ Concrete reference implementations are provided under **`examples/`** to demonst
 
 ### Available Examples
 
-- **[examples/openclaw/](examples/openclaw/)** - Pre-execution judgment boundary using agent framework native hooks
+- **[examples/openclaw/](examples/openclaw/)** - Pre-execution judgment boundary proof using agent framework native hooks
   - Demonstrates: structural position, temporal ordering, audit format
   - Shows: 4/4 dangerous scenarios blocked before execution
   - Proves: Prevention is achievable by structural design
+  - ⚠️ **Non-production proof artifact** - See [NON_PRODUCTION_NOTICE.md](examples/openclaw/NON_PRODUCTION_NOTICE.md)
 
 **These examples are proofs of structural placement, not endorsements or critiques of any specific framework.**
 
@@ -270,8 +276,6 @@ and workflow optimization are explicitly **out of scope** for this version.
 ---
 
 ## Contributing
-
-This is a private repository during initial development.
 
 For specification changes, see [RFC Process](docs/RFC_PROCESS.md).
 
