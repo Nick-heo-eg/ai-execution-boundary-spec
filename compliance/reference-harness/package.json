@@ -1,0 +1,20 @@
+{
+  "name": "aebs-reference-harness",
+  "version": "0.9.0",
+  "description": "AEBS v0.9 Reference Harness - Structural viability demonstration",
+  "type": "module",
+  "scripts": {
+    "test": "node test-runner.js"
+  },
+  "keywords": [
+    "aebs",
+    "execution-boundary",
+    "ai-safety",
+    "judgment"
+  ],
+  "author": "AEBS Contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
