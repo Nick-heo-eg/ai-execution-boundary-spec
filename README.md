@@ -18,6 +18,23 @@ This standard is framework-agnostic, runtime-agnostic, and vendor-neutral.
 
 ---
 
+## Repository Structure
+
+```
+/spec          → Normative specifications and formal models
+/compliance    → Reference harness and attack simulations
+/proof         → Cryptographic proof artifacts
+/examples      → Integration examples and demonstrations
+/docs          → Background documentation and rationale
+/archive       → Historical sealed versions and internal artifacts
+```
+
+**For Implementation:** See `/spec/` for normative requirements
+**For Testing:** See `/compliance/reference-harness/`
+**For Context:** See `/docs/` for rationale and background
+
+---
+
 ## 2. Problem Statement
 
 Current AI agent systems typically combine proposal generation and execution authority within a single process. This creates structural conditions where:
