@@ -1,0 +1,23 @@
+name: AEBS Compliance
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install compliance deps
+        working-directory: compliance
+        run: npm ci
+
+      - name: Run AEBS Phase B tests
+        working-directory: compliance
+        run: npm test
