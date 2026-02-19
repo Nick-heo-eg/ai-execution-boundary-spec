@@ -16,7 +16,7 @@ jobs:
 
       - name: Install compliance deps
         working-directory: compliance
-        run: npm ci
+        run: npm install
 
       - name: Run AEBS Phase B tests
         working-directory: compliance

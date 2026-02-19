@@ -237,6 +237,35 @@ See [compliance/reference-harness/README.md](compliance/reference-harness/README
 
 ---
 
+## 9.1 Security Validation (Phase B)
+
+This repository includes runtime attack simulations demonstrating structural failure modes
+in systems without an execution boundary, and how AEBS blocks them:
+
+- **Direct execution bypass** — Execution without judgment
+- **Default-deny enforcement** — undefined/null state handling
+- **Stale decision / race condition** — Version-based freshness model
+- **State tampering** — Fail-closed validation
+
+See `/compliance/attack-vectors` and run:
+
+```bash
+cd compliance
+npm install
+npm test
+```
+
+Expected output:
+```
+PASS attack-direct-bypass
+PASS attack-default-deny
+PASS attack-race-condition
+PASS attack-state-tamper
+ALL PASS (AEBS Phase B)
+```
+
+---
+
 ## 10. Security Considerations
 
 ### Threat Model
