@@ -107,7 +107,7 @@ AEBS defines three decision states:
 | State | Execution Behavior   | Description |
 |-------|---------------------|-------------|
 | STOP  | MUST NOT execute    | Execution is explicitly prohibited |
-| HOLD  | MUST defer execution | Execution is paused pending decision |
+| HOLD  | MUST NOT execute    | Execution authority is not granted. No execution may occur unless a new evaluation produces an ALLOW decision. |
 | ALLOW | MAY execute         | Execution is authorized to proceed |
 | NULL  | MUST NOT execute    | Default-deny behavior |
 
@@ -120,6 +120,32 @@ AEBS defines three decision states:
 ```
 
 See [Formal Model](spec/aebs-formal-model.md) for detailed state transitions.
+
+### Environment Fingerprint
+
+The `environment_fingerprint` is a deterministic cryptographic hash derived from the execution environment context.
+
+**Requirements:**
+
+An AEBS implementation:
+
+- MUST compute the fingerprint deterministically
+- MUST ensure the fingerprint is identical between proposal evaluation and execution phases
+- MUST cause verification failure if the execution environment changes between evaluation and execution
+
+**Scope:**
+
+The exact attributes included in the fingerprint are implementation-specific and MUST be documented by the implementation.
+
+**Reference Implementation Example:**
+
+The [execution-guard-action](https://github.com/Nick-heo-eg/execution-guard-action) reference implementation derives the fingerprint from:
+
+- Node.js version
+- Runner operating system
+- Policy hash
+
+Other implementations may include additional attributes such as container ID, hardware identity, or deployment metadata.
 
 ---
 
@@ -336,13 +362,20 @@ When correctly implemented, AEBS provides:
 - **Audit trail** — Decision outcomes are observable
 - **Authority separation** — Judgment is separated from proposal and execution
 
-### Limitations
+### Security Assumptions and Limitations
 
-AEBS does NOT provide:
+AEBS assumes a trusted execution kernel and host environment.
 
+AEBS does NOT provide protection against:
+
+- Compromised execution kernels
+- Compromised host operating systems
+- Key exfiltration or signing key compromise
+- Physical or hypervisor-level attacks
 - Content safety evaluation
 - Adversarial robustness
-- Cryptographic proof of integrity
+
+AEBS enforces structural and cryptographic binding under the assumption that the execution kernel itself enforces token verification faithfully.
 
 These concerns require additional mechanisms beyond AEBS.
 
