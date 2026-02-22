@@ -1,10 +1,13 @@
 # AI Execution Boundary Standard (AEBS)
 
+**Part of the Execution Boundary ecosystem.**
+Defined by the AI Execution Boundary Standard (AEBS).
+
 **Vendor-neutral architectural standard for separating proposal, judgment, and execution in AI systems.**
 
-**Version:** v0.9-draft
-**Status:** Draft for Technical Review
-**Date:** 2026-02-19
+**Version:** v1.0-rc
+**Status:** Release Candidate
+**Date:** 2026-02-22
 
 ---
 
@@ -107,6 +110,45 @@ AEBS defines three decision states:
 ```
 
 See [Formal Model](spec/aebs-formal-model.md) for detailed state transitions.
+
+---
+
+## 4.1 Conformance Matrix
+
+AEBS defines three conformance levels for implementation verification:
+
+| Requirement | Level 1: Structural | Level 2: Observable | Level 3: Verifiable |
+|-------------|---------------------|---------------------|---------------------|
+| **Structural separation** | MUST | MUST | MUST |
+| **Default-deny enforcement** | MUST | MUST | MUST |
+| **STOP/HOLD/ALLOW states** | MUST | MUST | MUST |
+| **Decision state observability** | OPTIONAL | MUST | MUST |
+| **Pre-execution trace logging** | OPTIONAL | MUST | MUST |
+| **Cryptographic decision signing** | OPTIONAL | OPTIONAL | MUST |
+| **Authority transfer modeling** | OPTIONAL | OPTIONAL | MUST |
+| **Tamper-evident audit trail** | OPTIONAL | OPTIONAL | MUST |
+
+### Conformance Level Descriptions
+
+**Level 1: Structural Conformance**
+- Execution blocking capability exists
+- Decision states are implemented
+- No observability requirements
+
+**Level 2: Observable Conformance**
+- Level 1 requirements
+- Decision trail is accessible
+- State transitions are logged
+
+**Level 3: Verifiable Conformance**
+- Level 2 requirements
+- Cryptographic proof of decisions
+- Tamper-evident audit integrity
+
+### Reference Implementation
+
+→ **[execution-guard-action](https://github.com/Nick-heo-eg/execution-guard-action)**
+Conformance Level: Level 1 (Structural)
 
 ---
 
