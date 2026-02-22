@@ -11,6 +11,19 @@ Defined by the AI Execution Boundary Standard (AEBS).
 
 ---
 
+## Quick Summary
+
+AEBS is a vendor-neutral architectural standard that requires:
+
+- **Structural separation** between proposal and execution
+- **Default-deny enforcement** (execution MUST NOT occur unless explicitly authorized)
+- **Explicit decision states** (STOP / HOLD / ALLOW)
+- **Execution blocking capability** prior to runtime
+
+Normative requirements are defined under `/spec`. This repository contains the complete specification, conformance matrix, and reference materials.
+
+---
+
 ## 1. Overview
 
 The AI Execution Boundary Standard (AEBS) defines structural separation between proposal, judgment, and execution in AI agent systems.
@@ -142,8 +155,8 @@ AEBS defines three conformance levels for implementation verification:
 
 **Level 3: Verifiable Conformance**
 - Level 2 requirements
-- Cryptographic proof of decisions
-- Tamper-evident audit integrity
+- Cryptographic proof of decisions (when implemented)
+- Tamper-evident audit integrity (when implemented)
 
 ### Reference Implementation
 
@@ -229,11 +242,11 @@ AEBS does **NOT** define:
 - LLM alignment or fine-tuning techniques
 - Policy semantics or rule languages
 - Enforcement runtime implementations
-- Cryptographic integrity mechanisms
+- Specific cryptographic algorithms or key management (though Level 3 conformance requires cryptographic verification when implemented)
 - Harm prevention guarantees
 - Compliance certification procedures
 
-**Scope Limitation:** AEBS addresses structural separation only. All other concerns are explicitly out of scope.
+**Scope Limitation:** AEBS addresses structural separation requirements. Implementation details (including choice of cryptographic primitives for Level 3) are out of scope.
 
 ---
 
@@ -403,21 +416,21 @@ AEBS follows semantic versioning:
 
 ### Current Status
 
-**Version:** v0.9-draft
-**Tag:** `v0.9-draft`
+**Version:** v1.0-rc
+**Tag:** `v1.0-rc`
 
-This is a draft release intended for technical review and community feedback.
+This release candidate is considered structurally stable and open for evaluation.
 
-### Feedback Period
+### Feedback
 
-- **Duration:** 30 days from publication
 - **Mechanism:** GitHub Issues and Discussions
-- **Target:** v1.0 release following feedback incorporation
+- **Target:** v1.0 stable release following community review
 
 ### Roadmap
 
 - [x] v0.9-draft — Structural definition and conformance tests
-- [ ] v1.0 — Stable specification following community review
+- [x] v1.0-rc — Release candidate with conformance matrix
+- [ ] v1.0 — Stable specification
 - [ ] v1.1 — Additional conformance levels and formal model extensions
 
 ---
