@@ -151,5 +151,5 @@ Real systems require additional hardening beyond AEBS structural separation.
 
 ---
 
-**Status:** v0.9 Simulations
+**Status:** v1.0-rc Simulations
 **Part of:** AI Execution Boundary Standard (AEBS)

@@ -1,6 +1,6 @@
 # AEBS Conformance Tests
 
-**Part of:** AI Execution Boundary Standard (AEBS) v0.9-draft
+**Part of:** AI Execution Boundary Standard (AEBS) v1.0-rc
 
 ---
 
@@ -284,7 +284,7 @@ Decision state recorded in log or trace
 
 ---
 
-### Level 3: Authority-Aware Conformance
+### Level 3: Verifiable Conformance
 
 **Required Tests:**
 - All Level 2 tests
@@ -392,5 +392,5 @@ AEBS conformance is necessary but not sufficient for safe AI system operation.
 
 ---
 
-**Status:** Draft (v0.9)
+**Status:** Release Candidate (v1.0-rc)
 **Part of:** AI Execution Boundary Standard (AEBS)

@@ -1,7 +1,7 @@
 {
   "name": "aebs-reference-harness",
   "version": "0.9.0",
-  "description": "AEBS v0.9 Reference Harness - Structural viability demonstration",
+  "description": "AEBS v1.0-rc Reference Harness - Structural viability demonstration",
   "type": "module",
   "scripts": {
     "test": "node test-runner.js"

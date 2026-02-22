@@ -36,7 +36,7 @@ npm test
 Expected output:
 
 ```
-AEBS Compliance Test Suite v0.9
+AEBS Compliance Test Suite v1.0-rc
 
 [Category A: Decision Enforcement]
 
@@ -238,5 +238,5 @@ For AEBS specification questions:
 
 ---
 
-**Status:** Reference Implementation (v0.9)
+**Status:** Reference Implementation (v1.0-rc)
 **Part of:** AI Execution Boundary Standard (AEBS)

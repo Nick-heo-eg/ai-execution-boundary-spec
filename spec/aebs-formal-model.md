@@ -1,6 +1,6 @@
 # AEBS Formal Model
 
-**Part of:** AI Execution Boundary Standard (AEBS) v0.9-draft
+**Part of:** AI Execution Boundary Standard (AEBS) v1.0-rc
 
 ---
 
@@ -205,5 +205,5 @@ These extensions will be addressed in future versions.
 
 ---
 
-**Status:** Draft (v0.9)
+**Status:** Release Candidate (v1.0-rc)
 **Part of:** AI Execution Boundary Standard (AEBS)

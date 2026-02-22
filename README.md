@@ -213,11 +213,11 @@ Systems MAY claim conformance at the following levels:
 - Decision states recorded and observable
 - AEBS-1 (Judgment Trail) implemented
 
-### Level 3: Authority-Aware Conformance
+### Level 3: Verifiable Conformance
 
 - Level 2 requirements satisfied
-- AEBS-3 (Authority Transfer) implemented where applicable
-- Authority delegation explicitly modeled
+- Cryptographic verification implemented (when applicable)
+- Tamper-evident audit trail maintained
 
 See [Conformance Tests](spec/conformance-tests.md) for verification procedures.
 
