@@ -87,11 +87,8 @@ Reference Implementation: [execution-guard-action](https://github.com/Nick-heo-e
 
 ## Feedback and Contributions
 
-v1.0-rc feedback period: 2026-02-22 to 2026-03-01 (7 days)
-
 Submit feedback via:
 - GitHub Issues: https://github.com/Nick-heo-eg/ai-execution-boundary-spec/issues
-- Email: [maintainer contact if available]
 
 Acceptance criteria for v1.0 stable:
 - [ ] No critical normative ambiguities reported
@@ -109,4 +106,4 @@ Acceptance criteria for v1.0 stable:
 
 ---
 
-**Next Milestone**: v1.0 stable (target: 2026-03-01)
+**Next Milestone**: v1.0 stable
