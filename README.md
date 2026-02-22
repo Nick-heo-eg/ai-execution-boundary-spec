@@ -1,8 +1,5 @@
 # AI Execution Boundary Standard (AEBS)
 
-**Part of the Execution Boundary ecosystem.**
-Defined by the AI Execution Boundary Standard (AEBS).
-
 **Vendor-neutral architectural standard for separating proposal, judgment, and execution in AI systems.**
 
 **Version:** v1.0-rc
@@ -16,7 +13,7 @@ Defined by the AI Execution Boundary Standard (AEBS).
 AEBS is a vendor-neutral architectural standard that requires:
 
 - **Structural separation** between proposal and execution
-- **Default-deny enforcement** (execution MUST NOT occur unless explicitly authorized)
+- **Default-deny enforcement**: `execution MUST NOT occur unless decision_state == ALLOW`
 - **Explicit decision states** (STOP / HOLD / ALLOW)
 - **Execution blocking capability** prior to runtime
 
@@ -420,6 +417,8 @@ AEBS follows semantic versioning:
 **Tag:** `v1.0-rc`
 
 This release candidate is considered structurally stable and open for evaluation.
+
+No normative changes are expected prior to v1.0 unless critical issues are identified.
 
 ### Feedback
 
