@@ -1,509 +1,216 @@
-# AI Execution Boundary Standard (AEBS)
+# AI Execution Boundary Profile (v1.0-rc)
 
-**Vendor-neutral architectural standard for separating proposal, judgment, and execution in AI systems.**
+**AI application profile for [Execution Boundary Core Spec](https://github.com/Nick-heo-eg/execution-boundary-core-spec).**
 
-**Version:** v1.0-rc
-**Status:** Release Candidate
-**Date:** 2026-02-22
+Extends the transport-agnostic core model with AI-specific envelope fields, decision states, and tool-call examples.
 
 ---
 
-## Quick Summary
+## Dependency
 
-AEBS is a vendor-neutral architectural standard that requires:
+This profile is built on top of:
 
-- **Structural separation** between proposal and execution
-- **Default-deny enforcement**: `execution MUST NOT occur unless decision_state == ALLOW`
-- **Explicit decision states** (STOP / HOLD / ALLOW)
-- **Execution blocking capability** prior to runtime
+**[execution-boundary-core-spec v0.1](https://github.com/Nick-heo-eg/execution-boundary-core-spec)**
 
-Normative requirements are defined under `/spec`. This repository contains the complete specification, conformance matrix, and reference materials.
+Core Spec defines:
+- ActionEnvelope / Decision / Ledger / Runtime Adapter interfaces
+- Fail-closed requirement
+- Negative proof requirement
+- State model: `PROPOSED → EVALUATED → ALLOWED/DENIED/HOLD → EXECUTED/CLOSED`
 
----
-
-## 1. Overview
-
-The AI Execution Boundary Standard (AEBS) defines structural separation between proposal, judgment, and execution in AI agent systems.
-
-AEBS establishes **STOP as a first-class outcome** and formalizes execution constraints using explicit decision states.
-
-This standard is framework-agnostic, runtime-agnostic, and vendor-neutral.
+This profile extends those definitions for AI agent contexts.
 
 ---
 
-## Repository Structure
+## 1. Problem Statement
 
-```
-/spec          → Normative specifications and formal models
-/compliance    → Reference harness and attack simulations
-/proof         → Cryptographic proof artifacts
-/examples      → Integration examples and demonstrations
-/docs          → Background documentation and rationale
-/archive       → Historical sealed versions and internal artifacts
-```
+AI agent systems generate actions as proposals. Without a structural boundary, those proposals execute directly — without explicit authorization, without a verifiable denial record, and without a point where execution can be suppressed.
 
-**For Implementation:** See `/spec/` for normative requirements
-**For Testing:** See `/compliance/reference-harness/`
-**For Context:** See `/docs/` for rationale and background
+This profile defines how the core boundary model applies to:
+
+- LLM tool-call runtimes
+- Agent orchestration loops
+- Multi-agent delegation chains
 
 ---
 
-## 2. Problem Statement
+## 2. AI-Specific ActionEnvelope Extension
 
-Current AI agent systems typically combine proposal generation and execution authority within a single process. This creates structural conditions where:
+Base fields are defined in Core Spec. This profile adds:
 
-1. Generated actions execute without intermediate authorization
-2. Decision logic is embedded within inference processes
-3. Execution outcomes cannot be prevented by external judgment
-4. STOP is not structurally available as an outcome
+```json
+{
+  "action_id": "uuid",
+  "action_type": "tool.call",
+  "resource": "string",
+  "parameters": "object",
+  "context_hash": "string",
+  "timestamp": "string",
 
-AEBS addresses this through architectural separation requirements.
+  "model_id": "string",
+  "tool_name": "string",
+  "tool_arguments": "object",
+  "session_id": "string",
+  "confidence_score": "number | null"
+}
+```
+
+### Extended Field Definitions
+
+**`model_id`**
+Identifier of the model that proposed the action.
+Example: `"claude-sonnet-4-6"`, `"gpt-4o"`
+
+**`tool_name`**
+Name of the tool being invoked.
+Example: `"send_email"`, `"delete_file"`, `"transfer_funds"`
+
+**`tool_arguments`**
+Arguments passed to the tool. Treated as parameters in the base envelope.
+
+**`session_id`**
+Conversation or agent session identifier. Used for audit trail grouping.
+
+**`confidence_score`**
+Optional. Model-reported confidence for the proposed action. `null` if unavailable.
+Does not affect authorization. Recorded for observability only.
 
 ---
 
-## 3. Normative Summary
+## 3. Decision State Model
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this specification are to be interpreted as described in RFC 2119.
+Core Spec defines: `ALLOW | DENY | HOLD`
 
-### Core Requirement
+This profile maps legacy AEBS states:
 
-AEBS-compliant systems MUST satisfy the following condition:
+| Profile term | Core Spec term | Meaning |
+|---|---|---|
+| ALLOW | ALLOW | Execution authorized |
+| STOP | DENY | Execution prohibited |
+| HOLD | HOLD | Deferred, requires re-evaluation |
 
-```
-Execution MUST NOT occur unless decision_state == ALLOW
-```
-
-### Default-Deny Model
-
-AEBS follows a **default-deny model**:
-
-```
-If decision_state is undefined, unavailable, or NULL,
-execution MUST NOT occur.
-```
-
-### Judgment Independence
-
-Judgment MUST:
-
-- Occur prior to execution in the call path
-- Be technically capable of blocking execution at runtime without cooperation from the proposing component
-- Be structurally independent from the proposing system's inference process
+`STOP` is used in AI-facing documentation for clarity. Internally maps to `DENY`.
 
 ---
 
-## 4. Decision State Model
+## 4. Normative Requirements
 
-### Valid States
-
-AEBS defines three decision states:
-
-- **STOP** — Execution is prohibited
-- **HOLD** — Execution is deferred pending additional input
-- **ALLOW** — Execution is authorized
-
-### Execution Semantics
-
-| State | Execution Behavior   | Description |
-|-------|---------------------|-------------|
-| STOP  | MUST NOT execute    | Execution is explicitly prohibited |
-| HOLD  | MUST NOT execute    | Execution authority is not granted. No execution may occur unless a new evaluation produces an ALLOW decision. |
-| ALLOW | MAY execute         | Execution is authorized to proceed |
-| NULL  | MUST NOT execute    | Default-deny behavior |
-
-### State Machine
+From Core Spec (inherited, mandatory):
 
 ```
-[ Proposal ] → [ Judgment ] → [ Execution ]
-                    ↓
-              STOP / HOLD / ALLOW
+Execution MUST NOT occur unless decision.result == ALLOW
 ```
 
-See [Formal Model](spec/aebs-formal-model.md) for detailed state transitions.
+```
+If evaluation cannot be completed, the system MUST default to DENY (fail-closed)
+```
 
-### Environment Fingerprint
+```
+DENY decisions MUST be recorded in the ledger with a verifiable proof_hash
+```
 
-The `environment_fingerprint` is a deterministic cryptographic hash derived from the execution environment context.
+AI profile additions:
 
-**Requirements:**
-
-An AEBS implementation:
-
-- MUST compute the fingerprint deterministically
-- MUST ensure the fingerprint is identical between proposal evaluation and execution phases
-- MUST cause verification failure if the execution environment changes between evaluation and execution
-
-**Scope:**
-
-The exact attributes included in the fingerprint are implementation-specific and MUST be documented by the implementation.
-
-**Reference Implementation Example:**
-
-The [execution-guard-action](https://github.com/Nick-heo-eg/execution-guard-action) reference implementation derives the fingerprint from:
-
-- Node.js version
-- Runner operating system
-- Policy hash
-
-Other implementations may include additional attributes such as container ID, hardware identity, or deployment metadata.
+- `tool_name` MUST be present in the envelope when action_type is `tool.call`
+- `model_id` SHOULD be present for all AI-generated proposals
+- `session_id` SHOULD be present for audit trail continuity
 
 ---
 
-## 4.1 Conformance Matrix
+## 5. Reference Architecture
 
-AEBS defines three conformance levels for implementation verification:
-
-| Requirement | Level 1: Structural | Level 2: Observable | Level 3: Verifiable |
-|-------------|---------------------|---------------------|---------------------|
-| **Structural separation** | MUST | MUST | MUST |
-| **Default-deny enforcement** | MUST | MUST | MUST |
-| **STOP/HOLD/ALLOW states** | MUST | MUST | MUST |
-| **Decision state observability** | OPTIONAL | MUST | MUST |
-| **Pre-execution trace logging** | OPTIONAL | MUST | MUST |
-| **Cryptographic decision signing** | OPTIONAL | OPTIONAL | MUST |
-| **Authority transfer modeling** | OPTIONAL | OPTIONAL | MUST |
-| **Tamper-evident audit trail** | OPTIONAL | OPTIONAL | MUST |
-
-### Conformance Level Descriptions
-
-**Level 1: Structural Conformance**
-- Execution blocking capability exists
-- Decision states are implemented
-- No observability requirements
-
-**Level 2: Observable Conformance**
-- Level 1 requirements
-- Decision trail is accessible
-- State transitions are logged
-
-**Level 3: Verifiable Conformance**
-- Level 2 requirements
-- Cryptographic proof of decisions (when implemented)
-- Tamper-evident audit integrity (when implemented)
-
-### Reference Implementation
-
-→ **[execution-guard-action](https://github.com/Nick-heo-eg/execution-guard-action)**
-Conformance Level: Level 1 (Structural)
-
----
-
-## 5. Modular Structure
-
-AEBS consists of the following modular specifications:
-
-### AEBS-1: Judgment Trail
-
-Defines decision logging schema and temporal ordering requirements.
-
-**Repository:** [ai-judgment-trail-spec](https://github.com/Nick-heo-eg/ai-judgment-trail-spec)
-
-### AEBS-2: Execution Boundary
-
-Defines state enforcement model and role separation requirements.
-
-**Specification:** [spec/aebs-2-execution-boundary.md](spec/aebs-2-execution-boundary.md)
-
-**Repository:** [ai-execution-boundary-spec](https://github.com/Nick-heo-eg/ai-execution-boundary-spec) (this repository)
-
-### AEBS-3: Authority Transfer
-
-Defines agent judgment delegation and escalation protocols.
-
-**Repository:** [agent-judgment-spec](https://github.com/Nick-heo-eg/agent-judgment-spec)
-
-### AEBS-OTel: Observability Extension
-
-Defines OpenTelemetry integration patterns for execution boundary observability.
-
-**Repository:** [judgment-boundary-otel-spec](https://github.com/Nick-heo-eg/judgment-boundary-otel-spec)
+```
+LLM / Agent
+   ↓
+AI ActionEnvelope (tool_name, model_id, tool_arguments, ...)
+   ↓
+Evaluator (policy check, side-effect free)
+   ↓
+Decision (ALLOW | DENY | HOLD)
+   ↓
+Ledger Append (unconditional)
+   ↓
+Tool Runtime (ALLOW only)
+   ↓
+Side-Effect
+```
 
 ---
 
 ## 6. Conformance Levels
 
-Systems MAY claim conformance at the following levels:
+Inherits Core Spec conformance model. AI profile conformance requires:
 
-### Level 1: Structural Conformance
+**Level 1: Structural**
+- ActionEnvelope produced before tool execution
+- Evaluator called before runtime
+- Runtime blocked on non-ALLOW
 
-- Role separation requirements satisfied
-- Temporal ordering enforced
-- Independence requirements met
+**Level 2: Observable**
+- Level 1 satisfied
+- Ledger records all decisions including DENY
+- `proof_hash` present on all Decision objects
 
-### Level 2: Observability Conformance
-
-- Level 1 requirements satisfied
-- Decision states recorded and observable
-- AEBS-1 (Judgment Trail) implemented
-
-### Level 3: Verifiable Conformance
-
-- Level 2 requirements satisfied
-- Cryptographic verification implemented (when applicable)
-- Tamper-evident audit trail maintained
-
-See [Conformance Tests](spec/conformance-tests.md) for verification procedures.
+**Level 3: Verifiable**
+- Level 2 satisfied
+- `proof_hash` independently verifiable
+- Ledger tamper-evidence preserved
 
 ---
 
-## 7. Scope and Non-Goals
+## 7. Reference Implementation
 
-### In Scope
+**[execution-gate](https://github.com/Nick-heo-eg/execution-gate)**
 
-AEBS defines:
+Implements Core Spec v0.1 with Python. Demonstrates:
+- `ActionEnvelope.build()` — explicit envelope construction
+- `Gate.evaluate(envelope)` — side-effect-free evaluation
+- `Decision` with `decision_id`, `proof_hash`, `authority_token`
+- Append-only ledger via `emit_audit()`
+- `enforce` decorator — blocks execution on DENY
 
-- Structural separation between proposal, judgment, and execution
-- Decision state semantics
-- Temporal ordering requirements
-- Independence constraints
+---
 
-### Out of Scope
+## 8. Non-Goals
 
-AEBS does **NOT** define:
+This profile does not define:
 
-- AI safety mechanisms or content guardrails
-- LLM alignment or fine-tuning techniques
-- Policy semantics or rule languages
-- Enforcement runtime implementations
-- Specific cryptographic algorithms or key management (though Level 3 conformance requires cryptographic verification when implemented)
+- Policy language or rule syntax
+- LLM alignment or content filtering
+- Compliance certification
+- Specific cryptographic algorithms
 - Harm prevention guarantees
-- Compliance certification procedures
-
-**Scope Limitation:** AEBS addresses structural separation requirements. Implementation details (including choice of cryptographic primitives for Level 3) are out of scope.
 
 ---
 
-## 8. Compatibility
+## 9. Repository Structure
 
-### Framework Agnostic
-
-AEBS does not mandate:
-
-- Specific AI frameworks or libraries
-- Programming languages or runtimes
-- Deployment architectures
-- Observability platforms
-
-### Composability
-
-AEBS is designed to be composable with:
-
-- Observability standards (OpenTelemetry, Prometheus, etc.)
-- Policy frameworks (OPA, Cedar, etc.)
-- AI agent frameworks (LangChain, AutoGPT, etc.)
-- Existing runtime enforcement systems
-
----
-
-## 9. Reference Implementation
-
-A minimal reference implementation is provided to demonstrate structural viability:
-
-```bash
-cd compliance/reference-harness
-npm install
-npm test
 ```
-
-This harness demonstrates:
-- State machine enforcement
-- Default-deny behavior
-- Runtime blocking capability
-- Attack vector resistance
-
-See [compliance/reference-harness/README.md](compliance/reference-harness/README.md) for details.
-
----
-
-## 9.1 Security Validation (Phase B)
-
-This repository includes runtime attack simulations demonstrating structural failure modes
-in systems without an execution boundary, and how AEBS blocks them:
-
-- **Direct execution bypass** — Execution without judgment
-- **Default-deny enforcement** — undefined/null state handling
-- **Stale decision / race condition** — Version-based freshness model
-- **State tampering** — Fail-closed validation
-
-See `/compliance/attack-vectors` and run:
-
-```bash
-cd compliance
-npm install
-npm test
-```
-
-Expected output:
-```
-PASS attack-direct-bypass
-PASS attack-default-deny
-PASS attack-race-condition
-PASS attack-state-tamper
-ALL PASS (AEBS Phase B)
+/spec          → Normative specifications
+/compliance    → Conformance harness
+/proof         → Decision artifacts
+/examples      → Integration examples
+/docs          → Rationale and background
+/archive       → Historical versions
 ```
 
 ---
 
-## 10. Security Considerations
+## 10. Scope
 
-### Threat Model
+In scope:
+- Structural separation between proposal, evaluation, and execution
+- Decision state semantics for AI tool-call runtimes
+- Envelope extension fields for AI context
 
-AEBS assumes the following threats are in scope:
-
-1. **Unauthorized execution** — Actions execute without judgment
-2. **Judgment bypass** — Execution occurs despite STOP decision
-3. **Authority confusion** — Unclear responsibility for decisions
-
-### Security Properties
-
-When correctly implemented, AEBS provides:
-
-- **Structural prevention** — Execution cannot occur without ALLOW
-- **Audit trail** — Decision outcomes are observable
-- **Authority separation** — Judgment is separated from proposal and execution
-
-### Security Assumptions and Limitations
-
-AEBS assumes a trusted execution kernel and host environment.
-
-AEBS does NOT provide protection against:
-
-- Compromised execution kernels
-- Compromised host operating systems
-- Key exfiltration or signing key compromise
-- Physical or hypervisor-level attacks
-- Content safety evaluation
-- Adversarial robustness
-
-AEBS enforces structural and cryptographic binding under the assumption that the execution kernel itself enforces token verification faithfully.
-
-These concerns require additional mechanisms beyond AEBS.
+Out of scope:
+- AI safety mechanisms
+- Content guardrails
+- Policy semantics
+- Regulatory compliance
 
 ---
 
-## 11. Privacy Considerations
+## License
 
-AEBS implementations MAY collect:
-
-- Proposal content (action intents)
-- Judgment decisions (STOP/HOLD/ALLOW)
-- Execution outcomes
-
-Implementers MUST consider:
-
-- Data retention policies
-- PII handling in decision logs
-- Regulatory compliance (GDPR, CCPA, etc.)
-
-AEBS does not mandate specific privacy controls.
-
----
-
-## 12. FAQ
-
-### Q: Is AEBS a policy engine?
-
-**A:** No. AEBS defines structural separation, not policy semantics. Policy engines (like OPA or Cedar) MAY be used to implement judgment logic, but AEBS does not prescribe policy languages.
-
-### Q: Is AEBS equivalent to guardrails?
-
-**A:** No. Guardrails constrain model outputs or content. AEBS constrains execution authority through structural separation.
-
-### Q: Does AEBS guarantee safety?
-
-**A:** No. AEBS ensures structural separation only. Safety properties depend on the judgment logic implementation, which is outside AEBS scope.
-
-### Q: How does AEBS differ from RBAC or access control?
-
-**A:** RBAC controls who can perform actions. AEBS controls whether proposed actions execute at all, regardless of who proposed them.
-
-### Q: Is AEBS specific to LLM-based agents?
-
-**A:** No. AEBS applies to any AI system that generates executable actions, including rule-based agents, symbolic planners, and hybrid systems.
-
----
-
-## 13. Versioning and Evolution
-
-### Version Scheme
-
-AEBS follows semantic versioning:
-
-- **Major version** — Breaking changes to normative requirements
-- **Minor version** — Backward-compatible additions
-- **Patch version** — Clarifications and corrections
-
-### Evolution Process
-
-1. **Proposals** — Community feedback via GitHub issues
-2. **Discussion** — Open review period (minimum 30 days)
-3. **Approval** — Consensus-based decision
-4. **Publication** — Version increment and changelog
-
----
-
-## 14. Status and Roadmap
-
-### Current Status
-
-**Version:** v1.0-rc
-**Tag:** `v1.0-rc`
-
-This release candidate is considered structurally stable and open for evaluation.
-
-No normative changes are expected prior to v1.0 unless critical issues are identified.
-
-### Feedback
-
-- **Mechanism:** GitHub Issues and Discussions
-- **Target:** v1.0 stable release following community review
-
-### Roadmap
-
-- [x] v0.9-draft — Structural definition and conformance tests
-- [x] v1.0-rc — Release candidate with conformance matrix
-- [ ] v1.0 — Stable specification
-- [ ] v1.1 — Additional conformance levels and formal model extensions
-
----
-
-## 15. Contributors
-
-AEBS is developed as an open standard with community input.
-
-Contributions are welcome via:
-
-- **GitHub Issues:** [ai-execution-boundary-spec/issues](https://github.com/Nick-heo-eg/ai-execution-boundary-spec/issues)
-- **Discussions:** [ai-execution-boundary-spec/discussions](https://github.com/Nick-heo-eg/ai-execution-boundary-spec/discussions)
-
----
-
-## 16. License
-
-MIT License — See [LICENSE](LICENSE) file for details.
-
-This specification may be implemented by any party without restriction.
-
----
-
-## 17. References
-
-1. **RFC 2119** — Key words for use in RFCs to Indicate Requirement Levels
-2. **OpenTelemetry** — Observability framework for cloud-native software
-3. **AEBS-1 Specification** — [ai-judgment-trail-spec](https://github.com/Nick-heo-eg/ai-judgment-trail-spec)
-4. **AEBS-3 Specification** — [agent-judgment-spec](https://github.com/Nick-heo-eg/agent-judgment-spec)
-5. **AEBS-OTel Specification** — [judgment-boundary-otel-spec](https://github.com/Nick-heo-eg/judgment-boundary-otel-spec)
-
----
-
-## Contact
-
-For questions, feedback, or contributions:
-
-- **GitHub Issues:** Technical questions and bug reports
-- **GitHub Discussions:** Design discussions and feature requests
-
----
-
-**AI Execution Boundary Standard (AEBS)**
-**Defining STOP as a first-class outcome in AI systems**
+MIT License — See [LICENSE](LICENSE) for details.
