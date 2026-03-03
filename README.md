@@ -81,7 +81,7 @@ Does not affect authorization. Recorded for observability only.
 
 Core Spec defines: `ALLOW | DENY | HOLD`
 
-This profile maps legacy AEBS states:
+This profile maps decision states as follows:
 
 | Profile term | Core Spec term | Meaning |
 |---|---|---|
@@ -93,7 +93,22 @@ This profile maps legacy AEBS states:
 
 ---
 
-## 4. Normative Requirements
+## 4. Extension Rules
+
+This profile extends Core Spec fields. Extension is **add-only**.
+
+Rules:
+- Core Spec fields MUST NOT be modified or removed
+- AI-specific fields are additive only
+- `action_type` for tool calls SHOULD be `"tool.call"` or a namespaced variant (e.g. `"tool.file.write"`)
+- Extended fields that are unavailable MUST be set to `null`, not omitted
+
+AI ActionEnvelope = Core ActionEnvelope + AI extension fields.
+Core ActionEnvelope fields remain the authoritative base.
+
+---
+
+## 5. Normative Requirements
 
 From Core Spec (inherited, mandatory):
 
